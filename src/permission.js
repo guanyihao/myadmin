@@ -8,7 +8,8 @@ import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const whiteList = ['/login', '/auth-redirect'] // no redirect whitelist
+// 白名单：添加 '/register' 允许未登录访问
+const whiteList = ['/login', '/auth-redirect', '/register'] // no redirect whitelist
 
 router.beforeEach(async(to, from, next) => {
   // start progress bar
@@ -23,30 +24,35 @@ router.beforeEach(async(to, from, next) => {
   if (hasToken) {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
+      console.log('已登录，重定向到主页')
       next({ path: '/' })
-      NProgress.done() // hack: https://github.com/PanJiaChen/vue-element-admin/pull/2939
+      NProgress.done()
     } else {
       // determine whether the user has obtained his permission roles through getInfo
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
+      console.log('检查用户角色:', hasRoles, store.getters.roles)
       if (hasRoles) {
+        console.log('已有角色，直接放行')
         next()
       } else {
+        console.log('没有角色，开始获取用户信息')
         try {
           // get user info
-          // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
           const { roles } = await store.dispatch('user/getInfo')
-
+          console.log('获取到的角色:', roles)
           // generate accessible routes map based on roles
           const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
-
+          console.log('生成的路由数量:', accessRoutes.length)
           // dynamically add accessible routes
           router.addRoutes(accessRoutes)
 
           // hack method to ensure that addRoutes is complete
           // set the replace: true, so the navigation will not leave a history record
+          console.log('添加路由后，跳转到原目标:', to.path)
           next({ ...to, replace: true })
         } catch (error) {
           // remove token and go to login page to re-login
+          console.error('获取用户信息失败:', error)
           await store.dispatch('user/resetToken')
           Message.error(error || 'Has Error')
           next(`/login?redirect=${to.path}`)

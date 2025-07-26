@@ -45,18 +45,20 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <!-- 登录按钮在最下方 -->
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:20px;" @click.native.prevent="handleLogin">
+        Login
+      </el-button>
 
-      <div style="position:relative">
-        <div class="tips">
-          <span>Username : admin</span>
-          <span>Password : any</span>
-        </div>
-        <div class="tips">
-          <span style="margin-right:18px;">Username : editor</span>
-          <span>Password : any</span>
+      <!-- 水平容器：左侧注册框 + 右侧Or connect with按钮 -->
+      <div class="horizontal-group">
+        <!-- 左侧注册容器框 -->
+        <div class="register-container">
+          <span>若无账号请</span>
+          <span class="register-link" @click="$router.push('/register')">注册</span>
         </div>
 
+        <!-- 右侧Or connect with容器 -->
         <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
           Or connect with
         </el-button>
@@ -65,9 +67,7 @@
 
     <el-dialog title="Or connect with" :visible.sync="showDialog">
       Can not be simulated on local, so please combine you own business simulation! ! !
-      <br>
-      <br>
-      <br>
+      <br><br><br>
       <social-sign />
     </el-dialog>
   </div>
@@ -124,9 +124,6 @@ export default {
       immediate: true
     }
   },
-  created() {
-    // window.addEventListener('storage', this.afterQRScan)
-  },
   mounted() {
     if (this.loginForm.username === '') {
       this.$refs.username.focus()
@@ -134,20 +131,13 @@ export default {
       this.$refs.password.focus()
     }
   },
-  destroyed() {
-    // window.removeEventListener('storage', this.afterQRScan)
-  },
   methods: {
     checkCapslock(e) {
       const { key } = e
       this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
     },
     showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
+      this.passwordType = this.passwordType === 'password' ? '' : 'password'
       this.$nextTick(() => {
         this.$refs.password.focus()
       })
@@ -178,35 +168,16 @@ export default {
         return acc
       }, {})
     }
-    // afterQRScan() {
-    //   if (e.key === 'x-admin-oauth-code') {
-    //     const code = getQueryObject(e.newValue)
-    //     const codeMap = {
-    //       wechat: 'code',
-    //       tencent: 'code'
-    //     }
-    //     const type = codeMap[this.auth_type]
-    //     const codeName = code[type]
-    //     if (codeName) {
-    //       this.$store.dispatch('LoginByThirdparty', codeName).then(() => {
-    //         this.$router.push({ path: this.redirect || '/' })
-    //       })
-    //     } else {
-    //       alert('第三方登录失败')
-    //     }
-    //   }
-    // }
   }
 }
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
+/* 基础样式 */
 $bg:#283443;
 $light_gray:#fff;
 $cursor: #fff;
+$blue: #409eff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
   .login-container .el-input input {
@@ -214,7 +185,6 @@ $cursor: #fff;
   }
 }
 
-/* reset element-ui css */
 .login-container {
   .el-input {
     display: inline-block;
@@ -251,6 +221,8 @@ $cursor: #fff;
 $bg:#2d3a4b;
 $dark_gray:#889aa4;
 $light_gray:#eee;
+$blue: #409eff;
+$border-radius: 5px;
 
 .login-container {
   min-height: 100%;
@@ -267,16 +239,41 @@ $light_gray:#eee;
     overflow: hidden;
   }
 
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
+  /* 水平容器：让注册框和Or connect with按钮水平对齐 */
+  .horizontal-group {
+    display: flex;
+    align-items: center; /* 垂直居中对齐 */
+    gap: 10px; /* 两个元素之间的间距 */
+    margin-top: 10px;
+  }
 
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
+  /* 左侧注册容器框样式 */
+  .register-container {
+    height: 36px; /* 与右侧Or按钮高度一致 */
+    line-height: 36px; /* 文字垂直居中 */
+    padding: 0 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1); /* 统一边框样式 */
+    border-radius: $border-radius;
+    background: rgba(0, 0, 0, 0.1); /* 与输入框背景协调 */
+    color: $light_gray; /* 文字白色 */
+    font-size: 14px;
+    white-space: nowrap; /* 防止文字换行 */
+  }
+
+  /* 注册链接样式 */
+  .register-link {
+    color: $blue;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 4px;
+  }
+
+  /* 右侧Or connect with按钮样式调整 */
+  .thirdparty-button {
+    flex: 1; /* 占剩余宽度 */
+    height: 36px; /* 固定高度，与左侧注册框一致 */
+    border-radius: $border-radius;
+    padding: 0 15px;
   }
 
   .svg-container {
@@ -288,12 +285,10 @@ $light_gray:#eee;
   }
 
   .title-container {
-    position: relative;
-
     .title {
       font-size: 26px;
       color: $light_gray;
-      margin: 0px auto 40px auto;
+      margin: 0 auto 40px;
       text-align: center;
       font-weight: bold;
     }
@@ -309,12 +304,6 @@ $light_gray:#eee;
     user-select: none;
   }
 
-  .thirdparty-button {
-    position: absolute;
-    right: 0;
-    bottom: 6px;
-  }
-
   @media only screen and (max-width: 470px) {
     .thirdparty-button {
       display: none;
@@ -322,3 +311,4 @@ $light_gray:#eee;
   }
 }
 </style>
+

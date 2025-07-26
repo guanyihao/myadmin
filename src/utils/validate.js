@@ -15,8 +15,11 @@ export function isExternal(path) {
  * @returns {Boolean}
  */
 export function validUsername(str) {
-  const valid_map = ['admin', 'editor']
-  return valid_map.indexOf(str.trim()) >= 0
+  // 去掉原有的白名单限制，改为验证用户名非空且长度合理（例如 1-20 个字符）
+  const trimmedStr = str.trim()
+  // 允许字母、数字、下划线，长度 1-20 位（可根据你的业务调整）
+  const reg = /^[\w]{1,20}$/
+  return reg.test(trimmedStr)
 }
 
 /**

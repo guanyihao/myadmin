@@ -11,6 +11,9 @@ import componentsRouter from './modules/components'
 import chartsRouter from './modules/charts'
 import tableRouter from './modules/table'
 import nestedRouter from './modules/nested'
+/* 导入设备管理的组件 */
+import EquipmentEntry from '@/views/equipment/EquipmentEntry' // 设备录入页面
+import NewEquipmentList from '@/views/equipment/NewEquipmentList' // 新的设备列表页面
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -56,6 +59,11 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/register',
+    component: () => import('@/views/register/index'),
+    hidden: true
+  },
+  {
     path: '/auth-redirect',
     component: () => import('@/views/login/auth-redirect'),
     hidden: true
@@ -83,6 +91,38 @@ export const constantRoutes = [
       }
     ]
   },
+
+  // 设备管理
+  {
+    path: '/equipment',
+    component: Layout,
+    meta: {
+      title: '设备管理',
+      icon: 'el-icon-s-tools' // 设备工具图标
+    },
+    children: [
+    // 设备录入子菜单
+      {
+        path: 'entry',
+        name: 'EquipmentEntry',
+        component: EquipmentEntry,
+        meta: {
+          title: '设备录入',
+          icon: 'el-icon-box'// 设备箱子图标
+        }
+      },
+      {
+        path: 'new-list',
+        name: 'NewEquipmentList',
+        component: NewEquipmentList,
+        meta: {
+          title: '设备列表（新）',
+          icon: 'el-icon-s-grid'// 列表图标
+        }
+      }
+    ]
+  },
+  // 设备管理模块结束
   {
     path: '/documentation',
     component: Layout,
